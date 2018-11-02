@@ -19,6 +19,7 @@
   "dependencies": {
     "@dkuida/logger-wrapper": "^1.4.11",
     "nats": "^1.0.0",
+    "dotenv": "^6.1.0",
     "moleculer": "^0.13.0"
   },
   "engines": {
