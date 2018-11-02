@@ -1,21 +1,22 @@
 'use strict';
-
-// More info about options: https://moleculer.services/docs/0.13/broker.html#Broker-options
+require('dotenv').config();
+const { extend } = require('moleculer').Logger;
+const logger = require('./bin/logger');
+const loggerConfig = require('./config/logger');
 module.exports = {
 	namespace: '',
-	nodeID: null,
+	nodeID: process.env.HOSTNAME || null,
 
-	logger: true,
+	logger: loggerConfig.local ? true : (bindings) => extend(logger(bindings)),
 	logLevel: 'info',
 	logFormatter: 'default',
 	logObjectPrinter: null,
-
 	transporter: {
 		type: 'NATS',
 		options: {
-			url: 'nats://localhost:31002',
-			user: 'nats_cluster',
-			pass: 'g5I0Zjf9Ig'
+			url: process.env.NATS_HOST,
+			user: process.env.NATS_USER,
+			pass: process.env.NATS_PASS
 		}
 	},
 
@@ -28,7 +29,7 @@ module.exports = {
 		delay: 100,
 		maxDelay: 1000,
 		factor: 2,
-		check: err => err && !!err.retryable
+		check: (err) => err && !!err.retryable
 	},
 
 	maxCallLevel: 100,
@@ -40,7 +41,7 @@ module.exports = {
 		shutdownTimeout: 5000
 	},
 
-	disableBalancer: false,
+	disableBalancer: true,
 
 	registry: {
 		strategy: 'RoundRobin',
@@ -48,12 +49,12 @@ module.exports = {
 	},
 
 	circuitBreaker: {
-		enabled: false,
+		enabled: true,
 		threshold: 0.5,
 		windowTime: 60,
 		minRequestCount: 20,
 		halfOpenTime: 10 * 1000,
-		check: err => err && err.code >= 500
+		check: (err) => err && err.code >= 500
 	},
 
 	bulkhead: {
